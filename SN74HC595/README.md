@@ -37,7 +37,7 @@ sn74hc595.c → Driver implementation
 
 1. Add `sn74hc595.c` to your source folder  
 2. Add `sn74hc595.h` to your include path  
-3. Enable SPI as Half-Dulpex Master, and CS pin as GPIO output  
+3. Enable SPI as Half-Dulpex Master
 4. Configure SPI in MODE 0 (CPOL=0, CPHA=0)  
 5. Set baud rate under maximum according to datasheet
 6. Set data size to 8 bits
@@ -86,7 +86,7 @@ sn74hc595_shift_byte(&shiftreg, 0b01101001);
 
 #### SPI in Interrupt Mode:
 
-Note that CS Pin must be triggered in callback function
+Note that latch pin function must be triggered in callback function
 
 ```c
 sn74hc595_cfg_t shiftreg;
@@ -103,13 +103,15 @@ sn74hc595_shift_byte(&shiftreg, 0b01101001);
 
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-    sn74hc595_latch_callback(hspi);
+    if (hspi == hw_cfg->hspi){
+        sn74hc595_latch_data(&hw_cfg);
+    }
 }
 ```
 
 #### SPI in DMA Mode:
 
-Note that CS Pin must be triggered manually
+Note that latch pin function must be triggered manually
 
 ```c
 sn74hc595_cfg_t shiftreg;
@@ -122,5 +124,5 @@ sn74hc595_config(
     SN74HC595_SPI_DMA
 );
 
-sn74hc595_shift_byte(&shiftreg, 0xF0);
+sn74hc595_shift_byte(&shiftreg, 0b01101001);
 ```

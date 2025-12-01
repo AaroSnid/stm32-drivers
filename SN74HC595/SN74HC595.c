@@ -32,16 +32,22 @@ int sn74hc595_config(sn74hc595_cfg_t* hw_cfg, SPI_HandleTypeDef* hspi, GPIO_Type
     return 0;
 }
 
-int sn74hc595_shift_byte( sn74hc595_cfg_t* hw_cfg, uint8_t data) {
+int sn74hc595_latch_data(sn74hc595_cfg_t* hw_cfg){
+    if (!hw_cfg) return -1;
+    HAL_GPIO_WritePin(hw_cfg->rclk_port, hw_cfg->rclk_pin, GPIO_PIN_SET);
+    HAL_Delay(1);
+    HAL_GPIO_WritePin(hw_cfg->rclk_port, hw_cfg->rclk_pin, GPIO_PIN_RESET);
+    return 0;
+}
+
+int sn74hc595_shift_byte(sn74hc595_cfg_t* hw_cfg, uint8_t data) {
     if (!hw_cfg) return -1;
     if (hw_cfg->config_run != 1) return -1;
     uint8_t tx_data[1] = {data};
 
-    HAL_GPIO_WritePin(hw_cfg->rclk_port, hw_cfg->rclk_pin, GPIO_PIN_RESET);
     if (hw_cfg->transmit_function(hw_cfg->hspi, tx_data, 1) != HAL_OK) return -1;
     if (hw_cfg->spi_mode == SN74HC595_SPI_BLOCKING){
-        HAL_GPIO_WritePin(hw_cfg->rclk_port, hw_cfg->rclk_pin, GPIO_PIN_SET);
+        sn74hc595_latch_data(hw_cfg);
     }
-
     return 0;
 }
