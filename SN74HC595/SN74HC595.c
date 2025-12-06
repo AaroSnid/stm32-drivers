@@ -1,6 +1,4 @@
 #include "SN74HC595.h"
-#include "main.h"
-#include <stdint.h>
 
 HAL_StatusTypeDef standard_spi_transmit(SPI_HandleTypeDef* hspi, uint8_t* pData, uint16_t size) {
     return HAL_SPI_Transmit(hspi, pData, size, HAL_MAX_DELAY);
