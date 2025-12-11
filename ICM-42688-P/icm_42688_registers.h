@@ -1,5 +1,5 @@
-#ifndef _ICM_42688_REGISTERS
-#define _ICM_42688_REGISTERS
+#ifndef ICM_42688_REGISTERS_H_
+#define ICM_42688_REGISTERS_H_
 
 // Bank 0
 #define DEVICE_CONFIG       0x11
@@ -42,7 +42,7 @@
 #define ACCEL_CONFIG0       0x50
 #define GYRO_CONFIG1        0x51
 #define GYRO_ACCEL_CONFIG0  0x52
-#define ACCEFL_CONFIG1      0x53
+#define ACCEL_CONFIG1       0x53
 #define TMST_CONFIG         0x54
 #define APEX_CONFIG0        0x56
 #define SMD_CONFIG          0x57
