@@ -1,10 +1,10 @@
-#include "W25Q64JV_registers.h"
-#include "W25Q64JV.h"
+#include "w25q64jv_registers.h"
+#include "w25q64jv.h"
 
 typedef struct {
     void* comms_handle;
 
-} icm_42688_cfg_t;
+} w25q64jv_cfg_t;
 
 int write_enable();
 int volatile_sr_write_enable();
