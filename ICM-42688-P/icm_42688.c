@@ -10,24 +10,24 @@ int icm_42688_config(icm_42688_cfg_t* hw_cfg, void* comms_handle, GPIO_TypeDef* 
     return 0;
 }
 
-int cs_high(icm_42688_cfg_t* hw_cfg) { 
+static int cs_high(icm_42688_cfg_t* hw_cfg) { 
     if (hw_cfg->gpio_port == NULL) return -1;
     HAL_GPIO_WritePin(hw_cfg->gpio_port, hw_cfg->gpio_pin, GPIO_PIN_SET);
     return 0;
 }
 
-int cs_low(icm_42688_cfg_t* hw_cfg) { 
+static int cs_low(icm_42688_cfg_t* hw_cfg) { 
     if (hw_cfg->gpio_port == NULL) return -1;
     HAL_GPIO_WritePin(hw_cfg->gpio_port, hw_cfg->gpio_pin, GPIO_PIN_RESET);
     return 0;
 } 
 
-void build_spi_message(uint8_t* message, uint8_t read_write, uint8_t reg, uint8_t data) { 
+static void build_spi_message(uint8_t* message, uint8_t read_write, uint8_t reg, uint8_t data) { 
     message[0] = (read_write ? 0x80 : 0x00) | (reg & 0x7F);
     if (read_write == 0) message[1] = data;
 }
 
-int spi_read_data(icm_42688_cfg_t* hw_cfg, uint8_t reg, uint8_t* rx_data, uint8_t no_bytes) { 
+static int spi_read_data(icm_42688_cfg_t* hw_cfg, uint8_t reg, uint8_t* rx_data, uint8_t no_bytes) { 
     if (no_bytes < 2) return -1;    // Minimum 2 bytes
     uint8_t tx_buf[no_bytes + 1];
     uint8_t rx_buf[no_bytes + 1];
@@ -51,7 +51,7 @@ int icm_42688_read_reg(icm_42688_cfg_t* hw_cfg, uint8_t reg, uint8_t* rx_data) {
     return spi_read_data(hw_cfg, reg, rx_data, 1);  // In future will use function pointer to allow for i2c comms
 }
 
-int spi_write_data(icm_42688_cfg_t* hw_cfg, uint8_t reg, uint8_t data) { 
+static int spi_write_data(icm_42688_cfg_t* hw_cfg, uint8_t reg, uint8_t data) { 
     uint8_t tx_data[2] = {0xFF, 0xFF};
     build_spi_message(tx_data, 0, reg, data);
 
