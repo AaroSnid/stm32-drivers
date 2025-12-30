@@ -9,8 +9,8 @@ typedef struct {
     GPIO_TypeDef* gpio_port;
     uint16_t gpio_pin;
     uint8_t packet_no;
-    uint16_t accel_calibration[3];
-    uint16_t gyro_calibration[3];
+    int16_t accel_calibration[3];
+    int16_t gyro_calibration[3];
 } icm_42688_cfg_t;
 
 /**
@@ -156,7 +156,7 @@ int icm_42688_set_gyro_odr(icm_42688_cfg_t* hw_cfg, uint8_t out_data_rate);
  *
  * @return 0 or -1
  */
-int icm_42688_read_accel_xyz(icm_42688_cfg_t* hw_cfg, uint16_t* xyz_data);
+int icm_42688_read_accel_xyz(icm_42688_cfg_t* hw_cfg, int16_t* xyz_data);
 
 /**
  * @brief Read gyroscope data in XYZ order format
@@ -166,7 +166,7 @@ int icm_42688_read_accel_xyz(icm_42688_cfg_t* hw_cfg, uint16_t* xyz_data);
  *
  * @return 0 or -1
  */
-int icm_42688_read_gyro_xyz(icm_42688_cfg_t* hw_cfg, uint16_t* xyz_data);
+int icm_42688_read_gyro_xyz(icm_42688_cfg_t* hw_cfg, int16_t* xyz_data);
 
 /**
  * @brief Get offset of the accelerometer, data stored in hw_cfg
@@ -218,7 +218,7 @@ int icm_42688_config_fifo_register(icm_42688_cfg_t* hw_cfg, uint8_t packet_struc
  *
  * @return 0 or -1
  */
-int icm_42688_read_fifo(icm_42688_cfg_t* hw_cfg, uint8_t* gyro_data, uint8_t* accel_data, uint8_t* temp_data, uint8_t* time_data, uint8_t* extened_data);
+int icm_42688_read_fifo(icm_42688_cfg_t* hw_cfg, int8_t* gyro_data, int8_t* accel_data, int8_t* temp_data, int8_t* time_data, int8_t* extened_data);
 
 /**
  * @brief Read from the WHO_AM_I register, and compare with expected value

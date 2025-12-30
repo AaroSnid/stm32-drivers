@@ -126,23 +126,23 @@ int icm_42688_set_gyro_odr(icm_42688_cfg_t* hw_cfg, uint8_t out_data_rate) {
     return icm_42688_read_mod_write(hw_cfg, 0b1111, GYRO_CONFIG0, out_data_rate, 0);
 }
 
-int icm_42688_read_accel_xyz(icm_42688_cfg_t* hw_cfg, uint16_t* xyz_data) { 
+int icm_42688_read_accel_xyz(icm_42688_cfg_t* hw_cfg, int16_t* xyz_data) { 
     if (icm_42688_set_bank(hw_cfg, 0) != 0) return -1;
     uint8_t rx_data[6];
     if (spi_read_data(hw_cfg, ACCEL_DATA_X1, rx_data, 6) != 0) return -1;
-    xyz_data[0] = (rx_data[0] << 8) | rx_data[1];
-    xyz_data[1] = (rx_data[2] << 8) | rx_data[3];
-    xyz_data[2] = (rx_data[4] << 8) | rx_data[5];
+    xyz_data[0] = (int16_t)((rx_data[0] << 8) | rx_data[1]);
+    xyz_data[1] = (int16_t)((rx_data[2] << 8) | rx_data[3]);
+    xyz_data[2] = (int16_t)((rx_data[4] << 8) | rx_data[5]);
     return 0;
 }
 
-int icm_42688_read_gyro_xyz(icm_42688_cfg_t* hw_cfg, uint16_t* xyz_data) { 
+int icm_42688_read_gyro_xyz(icm_42688_cfg_t* hw_cfg, int16_t* xyz_data) { 
     if (icm_42688_set_bank(hw_cfg, 0) != 0) return -1;
     uint8_t rx_data[6];
     if (spi_read_data(hw_cfg, GYRO_DATA_X1, rx_data, 6) != 0) return -1;
-    xyz_data[0] = (uint16_t)(rx_data[0] << 8) | rx_data[1];
-    xyz_data[1] = (uint16_t)(rx_data[2] << 8) | rx_data[3];
-    xyz_data[2] = (uint16_t)(rx_data[4] << 8) | rx_data[5];
+    xyz_data[0] = (int16_t)((rx_data[0] << 8) | rx_data[1]);
+    xyz_data[1] = (int16_t)((rx_data[2] << 8) | rx_data[3]);
+    xyz_data[2] = (int16_t)((rx_data[4] << 8) | rx_data[5]);
     return 0;
 }
 
@@ -153,8 +153,8 @@ int icm_42688_calibrate_accel(icm_42688_cfg_t* hw_cfg) {
     // Set higher resolution for calibration
     if (icm_42688_set_accel_fs(hw_cfg, 3) != 0) return -1;
 
-    uint32_t accel_data_xyz[3] = {0};
-    uint16_t rx_data[3] = {0};
+    int32_t accel_data_xyz[3] = {0};
+    int16_t rx_data[3] = {0};
     for (int i = 0; i < CALIBRARION_SAMPLES; i++) { 
         if (icm_42688_read_accel_xyz(hw_cfg, rx_data) != 0) return -1;
         accel_data_xyz[0] += rx_data[0];
@@ -162,9 +162,9 @@ int icm_42688_calibrate_accel(icm_42688_cfg_t* hw_cfg) {
         accel_data_xyz[2] += rx_data[2];
         HAL_Delay(1);
     }
-    hw_cfg->accel_calibration[0] = (uint16_t)(accel_data_xyz[0] / CALIBRARION_SAMPLES);
-    hw_cfg->accel_calibration[1] = (uint16_t)(accel_data_xyz[1] / CALIBRARION_SAMPLES);
-    hw_cfg->accel_calibration[2] = (uint16_t)(accel_data_xyz[2] / CALIBRARION_SAMPLES);
+    hw_cfg->accel_calibration[0] = (int16_t)(accel_data_xyz[0] / CALIBRARION_SAMPLES);
+    hw_cfg->accel_calibration[1] = (int16_t)(accel_data_xyz[1] / CALIBRARION_SAMPLES);
+    hw_cfg->accel_calibration[2] = (int16_t)(accel_data_xyz[2] / CALIBRARION_SAMPLES);
 
     if (icm_42688_set_accel_fs(hw_cfg, current_scale) != 0) return -1;
     return 0;
@@ -177,8 +177,8 @@ int icm_42688_calibrate_gyro(icm_42688_cfg_t* hw_cfg) {
     // Set higher resolution for calibration
     if (icm_42688_set_gyro_fs(hw_cfg, 3) != 0) return -1;
 
-    uint32_t gyro_data_xyz[3] = {0};
-    uint16_t rx_data[3] = {0};
+    int32_t gyro_data_xyz[3] = {0};
+    int16_t rx_data[3] = {0};
     for (int i = 0; i < CALIBRARION_SAMPLES; i++) { 
         if (icm_42688_read_accel_xyz(hw_cfg, rx_data) != 0) return -1;
         gyro_data_xyz[0] += rx_data[0];
@@ -186,9 +186,9 @@ int icm_42688_calibrate_gyro(icm_42688_cfg_t* hw_cfg) {
         gyro_data_xyz[2] += rx_data[2];
         HAL_Delay(1);
     }
-    hw_cfg->accel_calibration[0] = (uint16_t)(gyro_data_xyz[0] / CALIBRARION_SAMPLES);
-    hw_cfg->accel_calibration[1] = (uint16_t)(gyro_data_xyz[1] / CALIBRARION_SAMPLES);
-    hw_cfg->accel_calibration[2] = (uint16_t)(gyro_data_xyz[2] / CALIBRARION_SAMPLES);
+    hw_cfg->accel_calibration[0] = (int16_t)(gyro_data_xyz[0] / CALIBRARION_SAMPLES);
+    hw_cfg->accel_calibration[1] = (int16_t)(gyro_data_xyz[1] / CALIBRARION_SAMPLES);
+    hw_cfg->accel_calibration[2] = (int16_t)(gyro_data_xyz[2] / CALIBRARION_SAMPLES);
 
     if (icm_42688_set_gyro_fs(hw_cfg, current_scale) != 0) return -1;
     return 0;
@@ -258,7 +258,7 @@ int icm_42688_config_fifo_register(icm_42688_cfg_t* hw_cfg, uint8_t packet_struc
     return 0;
 }
 
-int icm_42688_read_fifo(icm_42688_cfg_t* hw_cfg, uint8_t* gyro_data, uint8_t* accel_data, uint8_t* temp_data, uint8_t* time_data, uint8_t* extened_data) { 
+int icm_42688_read_fifo(icm_42688_cfg_t* hw_cfg, int8_t* gyro_data, int8_t* accel_data, int8_t* temp_data, int8_t* time_data, int8_t* extened_data) { 
     // This could be changed to read the header data instead of the packet variable (page 37) except for needing different read lengths
 
     if (icm_42688_set_bank(hw_cfg, 0) != 0) return -1; // Bank 0 data
