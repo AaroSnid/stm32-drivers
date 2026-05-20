@@ -4,6 +4,10 @@
 #include "main.h"
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     void* comms_handle;
     GPIO_TypeDef* gpio_port;
@@ -56,5 +60,9 @@ int fast_read_quad_output();
 int mftr_device_id_quad_io();
 int fast_read_quad_io();
 int set_burst_with_wrap();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* W25Q64JV_H_ */
