@@ -70,8 +70,8 @@ typedef enum {
 
 typedef struct {
     void *comms_handle;
-    GPIO_TypeDef* chip_select_port;
-    uint16_t chip_select_pin;
+    GPIO_TypeDef* cs_port;
+    uint16_t cs_pin;
 } lis3dhtr_cfg_t;
 
 typedef struct {
