@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include "main.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define SN74HC595_SPI_BLOCKING 1
 #define SN74HC595_SPI_IT 2
 #define SN74HC595_SPI_DMA 3
@@ -57,4 +61,9 @@ int sn74hc595_latch_data(sn74hc595_cfg_t* hw_cfg);
 int sn74hc595_shift_byte(   sn74hc595_cfg_t* hw_cfg, 
                             uint8_t data);
 
+                            
+#ifdef __cplusplus
+}
+#endif
+    
 #endif /* SN74HC595_H_ */

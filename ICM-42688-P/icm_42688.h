@@ -4,6 +4,10 @@
 #include "main.h"
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     void* comms_handle;
     GPIO_TypeDef* gpio_port;
@@ -271,4 +275,8 @@ int icm_42688_apex_wake_on_motion(icm_42688_cfg_t* hw_cfg, uint8_t interrupt_con
  */
 int icm_42688_apex_sig_motion_detect(icm_42688_cfg_t* hw_cfg, uint8_t interrupt_config);
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif /* ICM_42688_H_ */
