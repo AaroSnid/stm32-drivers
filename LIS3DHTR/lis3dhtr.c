@@ -82,7 +82,22 @@ int lis3dh_get_device_id(lis3dhtr_cfg_t *hw_cfg, uint8_t *device_id){
 int lis3dh_configure_data(lis3dhtr_cfg_t *hw_cfg, lis3dh_odr_t odr, lis3dh_sensitivity_t full_scale,
                           lis3dh_op_mode_t mode, uint8_t axes_en_mask){
     if (!hw_cfg) return -1;
-    return -1;
+
+    uint8_t new_reg_data;
+    uint8_t low_power_en_bit = ((uint8_t)mode == 0) ? 1 : 0;
+
+    // Write settings into CTRL_REG1
+    new_reg_data =  ((uint8_t)odr       << 4) | 
+                    (low_power_en_bit   << 3) | 
+                    (axes_en_mask & 0x7)    ; // Ensure only 3 lower bits
+    if (spi_write_data(hw_cfg, CTRL_REG1, &new_reg_data, 1) != 0) return -1;
+
+    // Read modify write CTRL_REG4 for full_scale bits
+    if (spi_read_data(hw_cfg, CTRL_REG4, &new_reg_data, 1) != 0) return -1;
+    new_reg_data = (new_reg_data & 0xCF) | ((uint8_t)full_scale << 4);
+    if (spi_write_data(hw_cfg, CTRL_REG4, &new_reg_data, 1) != 0) return -1;
+
+    return 0;
 }
 
 int lis3dh_set_high_pass_filter(lis3dhtr_cfg_t *hw_cfg, bool enable, lis3dh_high_pass_mode_t mode){

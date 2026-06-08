@@ -31,9 +31,9 @@ typedef enum {
     LIS3DH_ODR_100HZ            = 5,
     LIS3DH_ODR_200HZ            = 6,
     LIS3DH_ODR_400HZ            = 7,
-    LIS3DH_ODR_1_344KHZ         = 8,
-    LIS3DH_ODR_1_620KHZ         = 9,
-    LIS3DH_ODR_5_376KHZ         = 10,
+    LIS3DH_ODR_1_620KHZ         = 8,
+    LIS3DH_ODR_5_376KHZ         = 9,
+    LIS3DH_ODR_1_344KHZ         = 9,
 } lis3dh_odr_t;
 
 typedef enum {
