@@ -115,6 +115,8 @@ int lis3dh_read_raw_acceleration(lis3dhtr_cfg_t *hw_cfg, lis3dh_raw_data_t *raw_
     uint8_t rx_buffer[6];
     if (spi_read_data(hw_cfg, OUT_X_L, rx_buffer, 6) != 0) return -1;
 
+    // TODO: Fix 8 bit overflow
+    // TODO: Shift value based on full scale (8 bit, 10 bit, 12 bit data)
     raw_data->x = (rx_buffer[1] << 8) | rx_buffer[0];
     raw_data->y = (rx_buffer[3] << 8) | rx_buffer[2];
     raw_data->z = (rx_buffer[5] << 8) | rx_buffer[4];
@@ -179,23 +181,49 @@ int lis3dh_configure_sleep_to_wake(lis3dhtr_cfg_t *hw_cfg, bool enable, uint8_t 
 }
 
 int lis3dh_enable_aux_adc(lis3dhtr_cfg_t *hw_cfg, bool enable){
-    if (!hw_cfg) return -1;
-    return -1;
+
+    uint8_t new_reg_data;
+    if (spi_read_data(hw_cfg, CTRL_REG4, &new_reg_data, 1) != 0) return -1;
+    new_reg_data = new_reg_data & (((uint8_t)enable << 7) | 0x7FU);
+    if (spi_write_data(hw_cfg, CTRL_REG4, &new_reg_data, 1) != 0) return -1;
+
+    if (spi_read_data(hw_cfg, TEMP_CFG_REG, &new_reg_data, 1) != 0) return -1;
+    new_reg_data = new_reg_data & (((uint8_t)enable << 7) | 0x7FU);
+    if (spi_write_data(hw_cfg, TEMP_CFG_REG, &new_reg_data, 1) != 0) return -1;
+
+    return 0;
 }
 
 int lis3dh_enable_temperature_sensor(lis3dhtr_cfg_t *hw_cfg, bool enable){
-    if (!hw_cfg) return -1;
-    return -1;
+    
+    uint8_t new_reg_data;
+
+    if (spi_read_data(hw_cfg, TEMP_CFG_REG, &new_reg_data, 1) != 0) return -1;
+    new_reg_data = new_reg_data & (((uint8_t)enable << 6) | 0xBFU);
+    if (spi_write_data(hw_cfg, TEMP_CFG_REG, &new_reg_data, 1) != 0) return -1;
+
+    return 0;
 }
 
-int lis3dh_read_adc_channel(lis3dhtr_cfg_t *hw_cfg, lis3dh_adc_channel_t channel, int16_t *adc_raw){
+int lis3dh_read_adc_channel(lis3dhtr_cfg_t *hw_cfg, lis3dh_adc_channel_t channel, int16_t &adc_raw){
     if (!hw_cfg) return -1;
-    return -1;
+
+    uint8_t rx_buffer[2];
+
+    if (spi_read_data(hw_cfg, (OUT_ADC1_L + (uint8_t)channel), rx_buffer, 2) != 0) return -1;
+
+    adc_raw = ((((uint16_t)rx_buffer[1]) << 8) | (uint16_t)rx_buffer[0]) >> 6;
+    return 0;
 }
 
-int lis3dh_read_temperature(lis3dhtr_cfg_t *hw_cfg, float *temperature_c){
+int lis3dh_read_temperature(lis3dhtr_cfg_t *hw_cfg, float &temperature_c){
     if (!hw_cfg) return -1;
-    return -1;
+
+    uint8_t rx_buffer[2];
+    if (spi_read_data(hw_cfg, OUT_ADC3_L, rx_buffer, 2) != 0) return -1;
+
+    temperature_c = ((((uint16_t)rx_buffer[1]) << 8) | (uint16_t)rx_buffer[0]) >> 6;
+    return 0;
 }
 
 int lis3dh_configure_orientation_detection(lis3dhtr_cfg_t *hw_cfg, bool enable_6d, bool disable_z_axis_4d){

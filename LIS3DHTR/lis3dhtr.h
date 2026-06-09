@@ -56,9 +56,9 @@ typedef enum {
 } lis3dh_int_pin_t;
 
 typedef enum {
-    LIS3DH_ADC_CHANNEL_1        = 1,
+    LIS3DH_ADC_CHANNEL_1        = 0,
     LIS3DH_ADC_CHANNEL_2        = 2,
-    LIS3DH_ADC_CHANNEL_3        = 3,
+    LIS3DH_ADC_CHANNEL_3        = 4,
 } lis3dh_adc_channel_t;
 
 typedef enum {
@@ -211,7 +211,7 @@ int lis3dh_enable_temperature_sensor(lis3dhtr_cfg_t *hw_cfg, bool enable);
  * @param channel       ADC channel to read
  * @param adc_raw       Pointer to return raw ADC output
  */
-int lis3dh_read_adc_channel(lis3dhtr_cfg_t *hw_cfg, lis3dh_adc_channel_t channel, int16_t *adc_raw);
+int lis3dh_read_adc_channel(lis3dhtr_cfg_t *hw_cfg, lis3dh_adc_channel_t channel, int16_t &adc_raw);
 
 /**
  * @brief Reads temperature in degrees Celsius from the on-chip sensor.
@@ -219,7 +219,7 @@ int lis3dh_read_adc_channel(lis3dhtr_cfg_t *hw_cfg, lis3dh_adc_channel_t channel
  * @param hw_cfg        Driver configuration structure
  * @param temperature_c Pointer to return temperature in degrees Celsius
  */
-int lis3dh_read_temperature(lis3dhtr_cfg_t *hw_cfg, float *temperature_c);
+int lis3dh_read_temperature(lis3dhtr_cfg_t *hw_cfg, float &temperature_c);
 
 /**
  * @brief Enables 6D or 4D spatial orientation detection configurations
