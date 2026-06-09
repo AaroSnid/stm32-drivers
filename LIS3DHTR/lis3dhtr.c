@@ -110,18 +110,47 @@ bool lis3dh_is_data_ready(lis3dhtr_cfg_t *hw_cfg){
 }
 
 int lis3dh_read_raw_acceleration(lis3dhtr_cfg_t *hw_cfg, lis3dh_raw_data_t *raw_data){
-    if (!hw_cfg) return -1;
-    return -1;
+    if ((!hw_cfg) || (!raw_data)) return -1;
+
+    uint8_t rx_buffer[6];
+    if (spi_read_data(hw_cfg, OUT_X_L, rx_buffer, 6) != 0) return -1;
+
+    raw_data->x = (rx_buffer[1] << 8) | rx_buffer[0];
+    raw_data->y = (rx_buffer[3] << 8) | rx_buffer[2];
+    raw_data->z = (rx_buffer[5] << 8) | rx_buffer[4];
+
+    return 0;
 }
 
 int lis3dh_read_g_acceleration(lis3dhtr_cfg_t *hw_cfg, lis3dh_g_data_t *g_data){
-    if (!hw_cfg) return -1;
-    return -1;
+    if (!hw_cfg || !g_data) return -1;
+
+    lis3dh_raw_data_t raw_data;
+    uint8_t ctrl_reg4 = 0;
+    const float sensitivity_mg_per_lsb[4] = {1.0f, 2.0f, 4.0f, 12.0f};
+
+    if (lis3dh_read_raw_acceleration(hw_cfg, &raw_data) != 0) return -1;
+
+    if (spi_read_data(hw_cfg, CTRL_REG4, &ctrl_reg4, 1) != 0) return -1;
+
+    const uint8_t full_scale_bits = (ctrl_reg4 >> 4) & 0x03;
+    const float sensitivity_g_per_lsb = sensitivity_mg_per_lsb[full_scale_bits] / 1000.0f;
+
+    g_data->x_g = (float)raw_data.x * sensitivity_g_per_lsb;
+    g_data->y_g = (float)raw_data.y * sensitivity_g_per_lsb;
+    g_data->z_g = (float)raw_data.z * sensitivity_g_per_lsb;
+
+    return 0;
 }
 
 int lis3dh_get_status(lis3dhtr_cfg_t *hw_cfg, uint8_t *status){
-    if (!hw_cfg) return -1;
-    return -1;
+    if (spi_read_data(hw_cfg, STATUS_REG, status, 1) != 0) return -1;
+    return 0;
+}
+
+int lis3dh_get_aux_status(lis3dhtr_cfg_t *hw_cfg, uint8_t *status){
+    if (spi_read_data(hw_cfg, STATUS_REG_AUX, status, 1) != 0) return -1;
+    return 0;
 }
 
 int lis3dh_set_self_test(lis3dhtr_cfg_t *hw_cfg, bool enable, bool positive_sign){
@@ -131,7 +160,22 @@ int lis3dh_set_self_test(lis3dhtr_cfg_t *hw_cfg, bool enable, bool positive_sign
 
 int lis3dh_configure_sleep_to_wake(lis3dhtr_cfg_t *hw_cfg, bool enable, uint8_t threshold, uint8_t duration){
     if (!hw_cfg) return -1;
-    return -1;
+
+    if (enable == true{
+        uint8_t lower_threshold_bits = threshold & 0x7F;
+
+        // Write user settings
+        if (spi_write_data(hw_cfg, ACT_THS, &lower_threshold_bits, 1) != 0) return -1;
+        if (spi_write_data(hw_cfg, ACT_DUR, &duration, 1) != 0) return -1;
+
+    } else {
+        uint8_t empty_bits = 0;
+
+        // Write default value into registers
+        if (spi_write_data(hw_cfg, ACT_THS, &empty_bits, 1) != 0) return -1;
+        if (spi_write_data(hw_cfg, ACT_DUR, &empty_bits, 1) != 0) return -1;
+    }
+    return 0;
 }
 
 int lis3dh_enable_aux_adc(lis3dhtr_cfg_t *hw_cfg, bool enable){

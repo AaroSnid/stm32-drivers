@@ -162,6 +162,14 @@ int lis3dh_read_g_acceleration(lis3dhtr_cfg_t *hw_cfg, lis3dh_g_data_t *g_data);
 int lis3dh_get_status(lis3dhtr_cfg_t *hw_cfg, uint8_t *status);
 
 /**
+ * @brief Reads the full sensor aux status register.
+ *
+ * @param hw_cfg        Driver configuration structure
+ * @param status        Pointer to return aux status register contents
+ */
+int lis3dh_get_aux_status(lis3dhtr_cfg_t *hw_cfg, uint8_t *status);
+
+/**
  * @brief Enables or disables the self-test function.
  *
  * @param hw_cfg        Driver configuration structure
