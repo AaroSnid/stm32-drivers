@@ -250,32 +250,70 @@ int lis3dh_read_fifo_data(lis3dhtr_cfg_t *hw_cfg, lis3dh_raw_data_t *fifo_sample
 
 int lis3dh_configure_interrupt(lis3dhtr_cfg_t *hw_cfg, lis3dh_int_pin_t int_pin, uint8_t cfg_bits,
                                 uint8_t threshold, uint8_t duration){
-    if (!hw_cfg) return -1;
-    return -1;
+    
+    if (int_pin == LIS3DH_INT_PIN_1){
+
+        if (spi_write_data(hw_cfg, INT1_CFG, &cfg_bits, 1) != 0) return -1;
+
+        if (spi_write_data(hw_cfg, INT1_THS, &threshold, 1) != 0) return -1;
+        if (spi_write_data(hw_cfg, INT1_DURATION, &duration, 1) != 0) return -1;
+
+    } else {
+
+        if (spi_write_data(hw_cfg, INT2_CFG, &cfg_bits, 1) != 0) return -1;
+
+        if (spi_write_data(hw_cfg, INT2_THS, &threshold, 1) != 0) return -1;
+        if (spi_write_data(hw_cfg, INT2_DURATION, &duration, 1) != 0) return -1;
+    }
+
+    return 0;
 }
 
 int lis3dh_read_interrupt_source(lis3dhtr_cfg_t *hw_cfg, lis3dh_int_pin_t int_pin, uint8_t *source){
-    if (!hw_cfg) return -1;
-    return -1;
+    
+    if (int_pin == LIS3DH_INT_PIN_1){
+
+        if (spi_read_data(hw_cfg, INT1_SRC, source, 1) != 0) return -1;
+
+    } else {
+
+        if (spi_read_data(hw_cfg, INT2_SRC, source, 1) != 0) return -1;
+    }
+
+    return 0;
 }
 
 int lis3dh_configure_click(lis3dhtr_cfg_t *hw_cfg, uint8_t click_cfg, uint8_t click_ths,
                            uint8_t time_limit, uint8_t time_latency, uint8_t time_window){
-    if (!hw_cfg) return -1;
-                            return -1;
+    
+    uint8_t new_reg_data = click_cfg & 0x3F;
+
+    if (spi_write_data(hw_cfg, CLICK_CFG, &new_reg_data, 1) != 0) return -1;
+
+    new_reg_data = (click_ths & 0x7FU);
+    if (spi_write_data(hw_cfg, CLICK_THS, &new_reg_data, 1) != 0) return -1;
+
+    new_reg_data = (time_limit & 0x7FU);
+    if (spi_write_data(hw_cfg, TIME_LIMIT, &new_reg_data, 1) != 0) return -1;
+
+    if (spi_write_data(hw_cfg, TIME_LATENCY, &time_latency, 1) != 0) return -1;
+
+    if (spi_write_data(hw_cfg, TIME_WINDOW, &time_window, 1) != 0) return -1;
+    
+    return 0;
 }
 
 int lis3dh_read_click_source(lis3dhtr_cfg_t *hw_cfg, uint8_t *click_source){
-    if (!hw_cfg) return -1;
+    if (spi_read_data(hw_cfg, CLICK_SRC, click_source, 1) != 0) return -1;
     return -1;
 }
 
-int lis3dh_fifo_enable(lis3dhtr_cfg_t *hw_cfg){
-    if (!hw_cfg) return -1;
-    return -1;
-}
+int lis3dh_fifo_control(lis3dhtr_cfg_t *hw_cfg, bool enable){
+    uint8_t new_reg_data;
 
-int lis3dh_fifo_disable(lis3dhtr_cfg_t *hw_cfg){
-    if (!hw_cfg) return -1;
-    return -1;
+    if (spi_read_data(hw_cfg, CTRL_REG5, &new_reg_data, 1) != 0) return -1;
+    new_reg_data = new_reg_data & (((uint8_t)enable << 6) | 0xBFU);
+    if (spi_write_data(hw_cfg, CTRL_REG5, &new_reg_data, 1) != 0) return -1;
+
+    return 0;
 }
