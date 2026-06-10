@@ -115,11 +115,9 @@ int lis3dh_read_raw_acceleration(lis3dhtr_cfg_t *hw_cfg, lis3dh_raw_data_t *raw_
     uint8_t rx_buffer[6];
     if (spi_read_data(hw_cfg, OUT_X_L, rx_buffer, 6) != 0) return -1;
 
-    // TODO: Fix 8 bit overflow
-    // TODO: Shift value based on full scale (8 bit, 10 bit, 12 bit data)
-    raw_data->x = (rx_buffer[1] << 8) | rx_buffer[0];
-    raw_data->y = (rx_buffer[3] << 8) | rx_buffer[2];
-    raw_data->z = (rx_buffer[5] << 8) | rx_buffer[4];
+    raw_data->x = ((uint16_t)rx_buffer[1] << 8) | (uint16_t)rx_buffer[0];
+    raw_data->y = ((uint16_t)rx_buffer[3] << 8) | (uint16_t)rx_buffer[2];
+    raw_data->z = ((uint16_t)rx_buffer[5] << 8) | (uint16_t)rx_buffer[4];
 
     return 0;
 }
