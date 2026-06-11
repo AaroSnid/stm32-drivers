@@ -44,10 +44,10 @@ typedef enum {
 } lis3dh_fifo_mode_t;
 
 typedef struct {
+    uint8_t fill_level;
     bool empty;
     bool watermark;
     bool overrun;
-    uint8_t fill_level;
 } lis3dh_fifo_status_t;
 
 typedef enum {
@@ -211,7 +211,7 @@ int lis3dh_enable_temperature_sensor(lis3dhtr_cfg_t *hw_cfg, bool enable);
  * @param channel       ADC channel to read
  * @param adc_raw       Pointer to return raw ADC output
  */
-int lis3dh_read_adc_channel(lis3dhtr_cfg_t *hw_cfg, lis3dh_adc_channel_t channel, int16_t &adc_raw);
+int lis3dh_read_adc_channel(lis3dhtr_cfg_t *hw_cfg, lis3dh_adc_channel_t channel, int16_t *adc_raw);
 
 /**
  * @brief Reads temperature in degrees Celsius from the on-chip sensor.
@@ -219,7 +219,7 @@ int lis3dh_read_adc_channel(lis3dhtr_cfg_t *hw_cfg, lis3dh_adc_channel_t channel
  * @param hw_cfg        Driver configuration structure
  * @param temperature_c Pointer to return temperature in degrees Celsius
  */
-int lis3dh_read_temperature(lis3dhtr_cfg_t *hw_cfg, float &temperature_c);
+int lis3dh_read_temperature(lis3dhtr_cfg_t *hw_cfg, float *temperature_c);
 
 /**
  * @brief Enables 6D or 4D spatial orientation detection configurations
@@ -257,7 +257,18 @@ int lis3dh_get_fifo_status(lis3dhtr_cfg_t *hw_cfg, lis3dh_fifo_status_t *status)
  * @param samples_to_read   Number of samples requested
  * @param samples_read      Pointer to return number of samples actually read
  */
-int lis3dh_read_fifo_data(lis3dhtr_cfg_t *hw_cfg, lis3dh_raw_data_t *fifo_samples,
+int lis3dh_read_raw_fifo_data(lis3dhtr_cfg_t *hw_cfg, lis3dh_raw_data_t *fifo_samples,
+                          uint8_t samples_to_read, uint8_t *samples_read);
+
+/**
+ * @brief Reads acceleration samples in g from the FIFO buffer.
+ *
+ * @param hw_cfg            Driver configuration structure
+ * @param fifo_samples      Array to receive FIFO samples
+ * @param samples_to_read   Number of samples requested
+ * @param samples_read      Pointer to return number of samples actually read
+ */
+int lis3dh_read_g_fifo_data(lis3dhtr_cfg_t *hw_cfg, lis3dh_g_data_t *fifo_samples,
                           uint8_t samples_to_read, uint8_t *samples_read);
 
 /**
@@ -315,6 +326,14 @@ int lis3dh_fifo_enable(lis3dhtr_cfg_t *hw_cfg);
  * @param hw_cfg        Driver configuration structure
  */
 int lis3dh_fifo_disable(lis3dhtr_cfg_t *hw_cfg);
+
+/**
+ * @brief Controls SDO/SA0 pull-up
+ *
+ * @param hw_cfg        Driver configuration structure
+ * @param enable        True to enable pull-up
+ */
+int lis3dh_control_pull_up(lis3dhtr_cfg_t *hw_cfg, bool enable);
 
 #ifdef __cplusplus
 }
